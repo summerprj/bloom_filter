@@ -9,28 +9,37 @@ void read_file_into_filter() {
 	FILE* file = fopen(filename, "r");
 	if (file != NULL) {
 		char line[128];//буферная строка
-		while (fgets(line, sizeof line, file) != NULL) {
+
+		//while (fgets(line, sizeof line, file) != NULL) {
+		while (fscanf(file, "%s", line) > 0) {
 			put(line);
-			printf("line %s\n", line);
+			//printf("line %s\n", line);
 		}
 		fclose(file);
 	}
 }
 
+void check_key_and_write_to_file() {
+	char* filename_keys = "out_keys.txt";
+	FILE* file_keys = fopen(filename_keys, "r");
+	char* filename_out = "out.txt";
+	FILE* file_out = fopen(filename_out, "w");
+	if (file_keys!= NULL && file_out != NULL) {
+		char key[128];//буферная строка
+		//while (fgets(key, sizeof key, file_keys) != NULL) {
+		while (fscanf(file_keys, "%s", key) > 0) {
+			int res = mightContain(key);
+			fprintf(file_out, "%s %d\n", key, res);
+		}
+		fclose(file_keys);
+		fclose(file_out);
+	}
+}
+
 int main(int argc, char* argv[]) {
-	init_bloom_filter(2);
+	init_bloom_filter(2000);
 	read_file_into_filter();
-	char* key1 = "12";
-	char* key2 = "34";
-	char* key3 = "45678542";
-	char* key4 = "Bla-Bla";
-	//put(key1);
-	//put(key2);
-	printf("Bloom filter should contain key: %s , test result: %s\n",key1, btoa(mightContain(key1)));
-	printf("Bloom filter should contain key: %s , test result: %s\n", key2, btoa(mightContain(key2)));
-	printf("Bloom filter shouldn't contain key: %s , test result: %s\n", key3, btoa(mightContain(key3)));
-	printf("Bloom filter shouldn't contain key: %s , test result: %s\n", key4, btoa(mightContain(key4)));
-	
+	check_key_and_write_to_file();
 	return 0;
 }
 
